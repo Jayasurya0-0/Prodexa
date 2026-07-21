@@ -127,7 +127,7 @@ export default function DatabaseVisualizer() {
   })();
 
   // Global View Navigation: "schema", "rbac" or "supabase"
-  const [activeTab, setActiveTab] = useState<"schema" | "rbac" | "supabase">("schema");
+  const [activeTab, setActiveTab] = useState<"schema" | "rbac" | "supabase">("rbac");
 
   // Master Password Reset Override states
   const [isResetPassModalOpen, setIsResetPassModalOpen] = useState<boolean>(false);
@@ -1324,25 +1324,6 @@ CREATE POLICY delete_user_policy ON public.user_accounts
       {/* Dual Tabbed Navigation Panel with high visual design */}
       <div className="flex flex-wrap border-b border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl p-1.5 shadow-xs items-center gap-2">
         <button
-          onClick={() => setActiveTab("schema")}
-          className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all relative overflow-hidden cursor-pointer ${
-            activeTab === "schema"
-              ? "text-white bg-slate-900 dark:bg-neutral-800 shadow-sm"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <Database className="h-4 w-4 stroke-[2px]" />
-          PostgreSQL Relational Schema
-          {activeTab === "schema" && (
-            <motion.div 
-              layoutId="navTabIndicator"
-              className="absolute inset-0 bg-gradient-to-r from-slate-900 to-indigo-950 dark:from-neutral-850 dark:to-neutral-800 -z-10"
-              transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            />
-          )}
-        </button>
-
-        <button
           onClick={() => setActiveTab("rbac")}
           className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all relative overflow-hidden cursor-pointer ${
             activeTab === "rbac"
@@ -1360,31 +1341,12 @@ CREATE POLICY delete_user_policy ON public.user_accounts
             />
           )}
         </button>
-
-        <button
-          onClick={() => setActiveTab("supabase")}
-          className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all relative overflow-hidden cursor-pointer ${
-            activeTab === "supabase"
-              ? "text-white bg-slate-900 dark:bg-neutral-800 shadow-sm"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <Sparkles className="h-4 w-4 stroke-[2px] text-emerald-500" />
-          Supabase Connected DB
-          {activeTab === "supabase" && (
-            <motion.div 
-              layoutId="navTabIndicator"
-              className="absolute inset-0 bg-gradient-to-r from-slate-900 to-emerald-950 dark:from-neutral-850 dark:to-emerald-900 -z-10"
-              transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            />
-          )}
-        </button>
       </div>
 
       {/* ======================================================== */}
       {/* VIEW PANEL 1: POSTGRESQL SCHEMA VISUALIZER */}
       {/* ======================================================== */}
-      {activeTab === "schema" && (
+      {false && (
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
           
           {/* Left panel: Table Navigation Bar */}
@@ -2390,7 +2352,7 @@ CREATE POLICY delete_user_policy ON public.user_accounts
       {/* ======================================================== */}
       {/* VIEW PANEL 3: SUPABASE CONNECTED DATABASE INTERFACE */}
       {/* ======================================================== */}
-      {activeTab === "supabase" && (
+      {false && (
         <div className="space-y-6 animate-in fade-in duration-200">
           
           {/* Top Level Diagnostic Summary */}

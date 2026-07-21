@@ -182,6 +182,41 @@ export default function LinePerformanceTracker({
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
 
+  // Dynamic KPI-to-Department mapping state
+  const [kpiDepartments, setKpiDepartments] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem("mes_kpi_departments");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // Fallback
+      }
+    }
+    return {
+      efficiency: "IE",
+      attrition: "HR",
+      absenteeism: "HR",
+      sku_percentage: "Planning",
+      avg_lead_time: "Planning",
+      avg_production: "Production",
+      fpy: "Quality",
+      fqc_defects: "Quality",
+      audit_fail: "Quality",
+      rejection: "Quality"
+    };
+  });
+
+  const handleUpdateKpiDepartment = (kpiKey: string, department: string) => {
+    setKpiDepartments(prev => {
+      const next = { ...prev, [kpiKey]: department };
+      localStorage.setItem("mes_kpi_departments", JSON.stringify(next));
+      return next;
+    });
+    if (onAddActivityLog) {
+      onAddActivityLog(`Reconfigured authorization rule: '${kpiKey}' KPI is now managed by the '${department}' department.`, "info");
+    }
+  };
+
   // Department check helper
   const isUserInDepartment = (deptName: string): boolean => {
     if (!currentUser?.departments) return false;
@@ -194,32 +229,14 @@ export default function LinePerformanceTracker({
 
   // Map KPI key to responsible department
   const getKpiAllowedDepartment = (kpiKey: string): string => {
-    switch (kpiKey) {
-      case "efficiency":
-        return "IE";
-      case "attrition":
-      case "absenteeism":
-        return "HR";
-      case "sku_percentage":
-      case "avg_lead_time":
-        return "Planning";
-      case "avg_production":
-        return "Production";
-      case "fpy":
-      case "fqc_defects":
-      case "audit_fail":
-      case "rejection":
-        return "Quality";
-      default:
-        return "";
-    }
+    return kpiDepartments[kpiKey] || "Production";
   };
 
   // Check if cell is editable based on user role & department
   const isCellEditable = (kpiKey: string): boolean => {
     if (!currentUser) return false;
-    // Super Admin can edit all
-    if (currentUser.clearance === "Super Admin") return true;
+    // Admin and Super Admin can edit all
+    if (currentUser.clearance === "Super Admin" || currentUser.clearance === "Admin") return true;
     // Only Data Entry role can edit
     if (currentUser.clearance !== "Data Entry") return false;
     
@@ -2020,6 +2037,7 @@ export default function LinePerformanceTracker({
                         <th className="py-3 px-3">Score 8 Rule Limit</th>
                         <th className="py-3 px-3">Score 5 Rule Limit</th>
                         <th className="py-3 px-3">Direction</th>
+                        <th className="py-3 px-3">Authorized Dept</th>
                         <th className="py-3 px-3 text-center">Status</th>
                         <th className="py-3 px-3 text-center">Actions</th>
                       </tr>
@@ -2110,6 +2128,24 @@ export default function LinePerformanceTracker({
                             >
                               {k.is_smaller_better ? "Lower is Better" : "Higher is Better"}
                             </button>
+                          </td>
+
+                          {/* Authorized Dept dropdown */}
+                          <td className="py-3 px-3">
+                            <select
+                              value={getKpiAllowedDepartment(k.kpi_key)}
+                              onChange={(e) => handleUpdateKpiDepartment(k.kpi_key, e.target.value)}
+                              disabled={currentUser?.clearance !== "Admin" && currentUser?.clearance !== "Super Admin"}
+                              className="text-xs font-bold bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded px-1.5 py-1 text-slate-700 dark:text-neutral-200 outline-none cursor-pointer focus:border-indigo-500 disabled:opacity-50"
+                            >
+                              <option value="IE">IE</option>
+                              <option value="HR">HR</option>
+                              <option value="Planning">Planning</option>
+                              <option value="Production">Production</option>
+                              <option value="Quality">Quality</option>
+                              <option value="Sewing">Sewing</option>
+                              <option value="Operations">Operations</option>
+                            </select>
                           </td>
 
                            {/* Active Toggle */}
