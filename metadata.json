@@ -1,0 +1,8 @@
+{
+  "name": "Prodexa",
+  "description": "Enterprise-grade garment manufacturing execution system and real-time factory intelligence platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
